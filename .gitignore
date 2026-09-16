@@ -1,6 +1,9 @@
 # Dependencies
 **/node_modules
 .pnpm-store/
+.robotics-venv/
+__pycache__/
+.pytest_cache/
 
 # Build outputs
 dist/

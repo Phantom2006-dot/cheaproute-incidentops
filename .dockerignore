@@ -1,0 +1,14 @@
+node_modules
+.robotics-venv
+.env*
+.git
+.gitignore
+.manus-logs
+.vscode
+.idea
+dist
+coverage
+*.log
+__pycache__
+.pytest_cache
+*.pyc

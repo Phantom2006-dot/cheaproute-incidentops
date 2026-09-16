@@ -6,6 +6,7 @@ import { publicProcedure, router } from "./_core/trpc";
 import { analyzeIncident } from "./incidentops/core";
 import { persistAnalysis } from "./incidentops/db";
 import { createSpeechmaticsRealtimeToken } from "./incidentops/speechmatics";
+import { runVerifiedSimulation } from "./incidentops/simulation";
 
 export const appRouter = router({
     // if you need to use socket.io, read and register route in server/_core/index.ts, all api should start with '/api/' so that the gateway can route correctly
@@ -41,6 +42,9 @@ export const appRouter = router({
         }
       }),
     speechmaticsToken: publicProcedure.mutation(async () => createSpeechmaticsRealtimeToken()),
+    simulate: publicProcedure
+      .input(z.object({ approve: z.boolean().default(true) }))
+      .mutation(({ input }) => runVerifiedSimulation(input.approve)),
   }),
 
   // TODO: add feature routers here, e.g.
