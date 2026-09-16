@@ -10,11 +10,11 @@
 
 ## Final release entry
 
-- **Commit:** `baaf595`
+- **Commit:** `20b7617`
 - **Branch:** main
-- **Push:** pending until remote verification
+- **Push:** PASS — `github/main` verified at `20b7617`
 - **Build:** PASS locally
 - **Tests:** PASS locally
 - **Demo URL:** https://cheaproute-incidentops.onrender.com
 - **Provider/device:** deterministic planner, MuJoCo 3.13.0, CPU; no OpenVINO/Core Ultra claim
-- **Known limitations:** See README and architecture documentation.
+- **Known limitations:** Current Render service is Node-only, so the live simulator endpoint returns `BLOCKED` until the service runtime is switched to Docker. See README and architecture documentation.
