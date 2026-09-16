@@ -1,4 +1,6 @@
 import { RealtimeClient } from "@speechmatics/real-time-client";
+import { PCMRecorder } from "@speechmatics/browser-audio-input";
+import workletScriptURL from "@speechmatics/browser-audio-input/pcm-audio-worklet.min.js?url";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,28 +18,20 @@ function VoiceCapture({ enabled, onPartial, onFinal }: VoiceCaptureProps) {
   const [error, setError] = useState("");
   const clientRef = useRef<RealtimeClient | undefined>(undefined);
   const contextRef = useRef<AudioContext | undefined>(undefined);
-  const sourceRef = useRef<MediaStreamAudioSourceNode | undefined>(undefined);
-  const processorRef = useRef<ScriptProcessorNode | undefined>(undefined);
-  const streamRef = useRef<MediaStream | undefined>(undefined);
+  const recorderRef = useRef<PCMRecorder | undefined>(undefined);
   const tokenMutation = trpc.incidentOps.speechmaticsToken.useMutation();
 
   useEffect(() => () => {
-    processorRef.current?.disconnect();
-    sourceRef.current?.disconnect();
+    recorderRef.current?.stopRecording();
     contextRef.current?.close().catch(() => undefined);
-    streamRef.current?.getTracks().forEach((track) => track.stop());
   }, []);
 
   const stop = async () => {
     setState("stopping");
-    processorRef.current?.disconnect();
-    sourceRef.current?.disconnect();
-    streamRef.current?.getTracks().forEach((track) => track.stop());
+    recorderRef.current?.stopRecording();
     await clientRef.current?.stopRecognition({ noTimeout: true }).catch(() => undefined);
     await contextRef.current?.close().catch(() => undefined);
-    processorRef.current = undefined;
-    sourceRef.current = undefined;
-    streamRef.current = undefined;
+    recorderRef.current = undefined;
     contextRef.current = undefined;
     clientRef.current = undefined;
     setState("idle");
@@ -49,34 +43,36 @@ function VoiceCapture({ enabled, onPartial, onFinal }: VoiceCaptureProps) {
     setError("");
     try {
       const token = await tokenMutation.mutateAsync();
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true } });
-      const context = new AudioContext({ sampleRate: 44100 });
+      if (!navigator.mediaDevices?.getUserMedia) throw new Error("This browser does not provide microphone access. Use HTTPS or localhost and allow microphone permission.");
+      const context = new AudioContext();
       const client = new RealtimeClient({ url: token.websocketUrl, appId: "cheaproute-incidentops" });
       client.addEventListener("receiveMessage", (event) => {
         const data = event.data;
         if (data.message === "AddPartialTranscript") onPartial(data.metadata.transcript);
         if (data.message === "AddTranscript") onFinal(data.metadata.transcript);
-        if (data.message === "Error") setError(data.reason ?? "Speechmatics returned an error");
+        if (data.message === "Error") {
+          setError(data.reason ?? "Speechmatics returned an error");
+          setState("error");
+        }
       });
       await client.start(token.token, {
-        transcription_config: { language: "en", model: "standard", max_delay: 0.7, enable_partials: true },
-        audio_format: { type: "raw", encoding: "pcm_s16le", sample_rate: 44100 },
+        transcription_config: { language: "en", model: "enhanced", max_delay: 0.7, enable_partials: true },
+        audio_format: { type: "raw", encoding: "pcm_s16le", sample_rate: context.sampleRate },
       });
-      const source = context.createMediaStreamSource(stream);
-      const processor = context.createScriptProcessor(4096, 1, 1);
-      processor.onaudioprocess = (event) => {
-        const input = event.inputBuffer.getChannelData(0);
+      const recorder = new PCMRecorder(workletScriptURL);
+      recorder.addEventListener("audio", (event) => {
+        const input = event.data;
         const pcm = new Int16Array(input.length);
         for (let i = 0; i < input.length; i += 1) pcm[i] = Math.max(-1, Math.min(1, input[i])) * 0x7fff;
         client.sendAudio(pcm.buffer);
-      };
-      source.connect(processor);
-      processor.connect(context.destination);
+      });
+      await recorder.startRecording({
+        audioContext: context,
+        recordingOptions: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      });
       clientRef.current = client;
       contextRef.current = context;
-      sourceRef.current = source;
-      processorRef.current = processor;
-      streamRef.current = stream;
+      recorderRef.current = recorder;
       setState("listening");
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "Unable to start the microphone");

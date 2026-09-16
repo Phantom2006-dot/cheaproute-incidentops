@@ -18,3 +18,12 @@
 - **Demo URL:** https://cheaproute-incidentops.onrender.com
 - **Provider/device:** deterministic planner, MuJoCo 3.13.0, CPU; no OpenVINO/Core Ultra claim
 - **Known limitations:** Current Render service is Node-only, so the live simulator endpoint returns `BLOCKED` until the service runtime is switched to Docker. See README and architecture documentation.
+
+## 2026-09-16 — Repair Speechmatics browser capture
+
+- **Commit:** pending
+- **Reason:** Browser voice did not reliably produce audio/transcripts.
+- **Files:** `client/src/pages/Home.tsx`, `package.json`, `pnpm-lock.yaml`.
+- **Implementation:** Replaced deprecated `ScriptProcessorNode` capture with Speechmatics' official `PCMRecorder` and AudioWorklet package, used the browser's actual `AudioContext.sampleRate`, selected the documented enhanced model, and surfaced realtime server errors in the UI.
+- **Tests:** `pnpm check` — PASS. `pnpm test --run --exclude server/secrets.validation.test.ts` — PASS, 4 passed. `pnpm build` — PASS. Live Render status — BLOCKED because `speechmaticsConfigured` is currently false.
+- **Known limitations:** A `SPEECHMATICS_API_KEY` must still be configured in the Render service environment before live microphone testing can succeed.

@@ -103,6 +103,9 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.2.8
         version: 1.2.8(@types/react-dom@19.2.1(@types/react@19.2.1))(@types/react@19.2.1)(react-dom@19.2.1(react@19.2.1))(react@19.2.1)
+      '@speechmatics/browser-audio-input':
+        specifier: 2.0.4
+        version: 2.0.4
       '@speechmatics/real-time-client':
         specifier: ^8.5.1
         version: 8.5.1
@@ -2025,6 +2028,9 @@ packages:
   '@smithy/uuid@1.1.0':
     resolution: {integrity: sha512-4aUIteuyxtBUhVdiQqcDhKFitwfd9hqoSDYY2KRXiWtgoWJ9Bmise+KfEPDiVHWeJepvF8xJO9/9+WDIciMFFw==}
     engines: {node: '>=18.0.0'}
+
+  '@speechmatics/browser-audio-input@2.0.4':
+    resolution: {integrity: sha512-PNAl8KOWsnAlJ3wgwdSCiF45/D1LafySpufmfTDJgTv+IgJL1lfN824kElmHmeKTxjYB3D7WigTr62B14Vcang==}
 
   '@speechmatics/real-time-client@8.5.1':
     resolution: {integrity: sha512-WexIii88P8DSC9Xp+S6xPbA9PHZa2Z1C6qXcJLzB5dd1Wp1Cpw1fnpMz6C4fRD77/u7jmuLVhdYSvFjgC92HCw==}
@@ -6434,6 +6440,10 @@ snapshots:
   '@smithy/uuid@1.1.0':
     dependencies:
       tslib: 2.8.1
+
+  '@speechmatics/browser-audio-input@2.0.4':
+    dependencies:
+      typescript-event-target: 1.1.2
 
   '@speechmatics/real-time-client@8.5.1':
     dependencies:
