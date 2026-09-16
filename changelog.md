@@ -1,6 +1,6 @@
 ## 2026-09-16 — Verified MuJoCo bimanual MVP
 
-- **Commit:** pending
+- **Commit:** `baaf595`
 - **Reason:** Replace the fixed-success bimanual fixture with a real, constrained simulator path aligned to the online challenge.
 - **Files:** `robotics/mujoco_demo.py`, `robotics/test_mujoco_demo.py`, `robotics-requirements.txt`, `server/incidentops/simulation.ts`, `server/routers.ts`, `client/src/pages/Home.tsx`, `Dockerfile`, `.dockerignore`, `.gitignore`, `README.md`, `docs/demo-runbook.md`, `docs/architecture.md`.
 - **Implementation:** Added a seeded MuJoCo 3.13.0 scene with two articulated arm surrogates, table objects, overhead camera observation, semantic plan validation, explicit approval, bounded execution, evaluator metrics, and ordered trace events. Added a typed tRPC bridge and dashboard control. Added a Docker runtime for Render.
@@ -10,9 +10,9 @@
 
 ## Final release entry
 
-- **Commit:** pending
+- **Commit:** `baaf595`
 - **Branch:** main
-- **Push:** pending
+- **Push:** pending until remote verification
 - **Build:** PASS locally
 - **Tests:** PASS locally
 - **Demo URL:** https://cheaproute-incidentops.onrender.com
